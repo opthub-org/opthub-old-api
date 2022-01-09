@@ -1,0 +1,588 @@
+- table:
+    schema: public
+    name: competitions
+  object_relationships:
+  - name: owner
+    using:
+      foreign_key_constraint_on: owner_id
+  array_relationships:
+  - name: matches
+    using:
+      foreign_key_constraint_on:
+        column: competition_id
+        table:
+          schema: public
+          name: matches
+  insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        owner_id: X-Hasura-User-Id
+      columns:
+      - close_at
+      - description_en
+      - description_ja
+      - id
+      - public
+      - open_at
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - close_at
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - open_at
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        public:
+          _eq: true
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - close_at
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - open_at
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        _or:
+        - public:
+            _eq: true
+        - owner_id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - close_at
+      - description_en
+      - description_ja
+      - id
+      - open_at
+      - public
+      filter:
+        owner_id:
+          _eq: X-Hasura-User-Id
+      check: {}
+- table:
+    schema: public
+    name: environments
+  object_relationships:
+  - name: match
+    using:
+      foreign_key_constraint_on: match_id
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        match:
+          competition:
+            owner_id:
+              _eq: X-Hasura-User-Id
+      columns:
+      - key
+      - match_id
+      - public
+      - value
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - created_at
+      - id
+      - key
+      - match_id
+      - public
+      - updated_at
+      - value
+      filter:
+        _and:
+        - public:
+            _eq: true
+        - match:
+            competition:
+              public:
+                _eq: true
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - created_at
+      - id
+      - key
+      - match_id
+      - public
+      - updated_at
+      - value
+      filter:
+        _or:
+        - _and:
+          - public:
+              _eq: true
+          - match:
+              competition:
+                public:
+                  _eq: true
+        - match:
+            competition:
+              owner_id:
+                _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - key
+      - match_id
+      - public
+      - value
+      filter:
+        match:
+          competition:
+            owner_id:
+              _eq: X-Hasura-User-Id
+      check:
+        match:
+          competition:
+            owner_id:
+              _eq: X-Hasura-User-Id
+- table:
+    schema: public
+    name: indicators
+  object_relationships:
+  - name: owner
+    using:
+      foreign_key_constraint_on: owner_id
+  array_relationships:
+  - name: matches
+    using:
+      foreign_key_constraint_on:
+        column: indicator_id
+        table:
+          schema: public
+          name: matches
+  insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        owner_id: X-Hasura-User-Id
+      columns:
+      - description_en
+      - description_ja
+      - id
+      - image
+      - public
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - image
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        public:
+          _eq: true
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - image
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        _or:
+        - public:
+            _eq: true
+        - owner_id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - description_en
+      - description_ja
+      - id
+      - image
+      - public
+      filter:
+        owner_id:
+          _eq: X-Hasura-User-Id
+      check: {}
+- table:
+    schema: public
+    name: matches
+  object_relationships:
+  - name: competition
+    using:
+      foreign_key_constraint_on: competition_id
+  - name: indicator
+    using:
+      foreign_key_constraint_on: indicator_id
+  - name: problem
+    using:
+      foreign_key_constraint_on: problem_id
+  array_relationships:
+  - name: environments
+    using:
+      foreign_key_constraint_on:
+        column: match_id
+        table:
+          schema: public
+          name: environments
+  - name: solutions
+    using:
+      foreign_key_constraint_on:
+        column: match_id
+        table:
+          schema: public
+          name: solutions
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        competition:
+          owner_id:
+            _eq: X-Hasura-User-Id
+      columns:
+      - budget
+      - competition_id
+      - indicator_id
+      - name
+      - problem_id
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - budget
+      - created_at
+      - competition_id
+      - id
+      - indicator_id
+      - name
+      - problem_id
+      - updated_at
+      filter:
+        competition:
+          public:
+            _eq: true
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - budget
+      - created_at
+      - competition_id
+      - id
+      - indicator_id
+      - name
+      - problem_id
+      - updated_at
+      filter:
+        competition:
+          _or:
+          - public:
+              _eq: true
+          - owner_id:
+              _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - budget
+      - competition_id
+      - indicator_id
+      - name
+      - problem_id
+      filter:
+        competition:
+          owner_id:
+            _eq: X-Hasura-User-Id
+      check:
+        competition:
+          owner_id:
+            _eq: X-Hasura-User-Id
+- table:
+    schema: public
+    name: problems
+  object_relationships:
+  - name: owner
+    using:
+      foreign_key_constraint_on: owner_id
+  array_relationships:
+  - name: matches
+    using:
+      foreign_key_constraint_on:
+        column: problem_id
+        table:
+          schema: public
+          name: matches
+  insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        owner_id: X-Hasura-User-Id
+      columns:
+      - description_en
+      - description_ja
+      - id
+      - image
+      - public
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - image
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        public:
+          _eq: true
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - created_at
+      - description_en
+      - description_ja
+      - id
+      - image
+      - owner_id
+      - public
+      - updated_at
+      filter:
+        _or:
+        - public:
+            _eq: true
+        - owner_id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - description_en
+      - description_ja
+      - id
+      - image
+      - public
+      filter:
+        owner_id:
+          _eq: X-Hasura-User-Id
+      check: {}
+- table:
+    schema: public
+    name: progress
+  object_relationships:
+  - name: user
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: users
+        column_mapping:
+          user_id: id
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - match_id
+      - budget
+      - evaluated
+      - evaluating
+      - evaluation_error
+      - scored
+      - scoring
+      - scoring_error
+      - submitted
+      - scores
+      - user_id
+      - created_at
+      - evaluation_finished_at
+      - evaluation_started_at
+      - scoring_finished_at
+      - scoring_started_at
+      - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - user_id
+      - match_id
+      - budget
+      - submitted
+      - evaluating
+      - evaluation_error
+      - evaluated
+      - scoring
+      - scoring_error
+      - scored
+      - scores
+      - created_at
+      - updated_at
+      - evaluation_started_at
+      - evaluation_finished_at
+      - scoring_started_at
+      - scoring_finished_at
+      filter: {}
+      allow_aggregations: true
+- table:
+    schema: public
+    name: solutions
+  object_relationships:
+  - name: match
+    using:
+      foreign_key_constraint_on: match_id
+  - name: owner
+    using:
+      foreign_key_constraint_on: owner_id
+  insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        owner_id: X-Hasura-User-Id
+      columns:
+      - match_id
+      - variable
+      backend_only: false
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - id
+      - match_id
+      - constraint
+      - objective
+      - score
+      - variable
+      - owner_id
+      - evaluation_error
+      - scoring_error
+      - created_at
+      - evaluation_finished_at
+      - evaluation_started_at
+      - scoring_finished_at
+      - scoring_started_at
+      - updated_at
+      filter:
+        match:
+          competition:
+            close_at:
+              _lt: now()
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - id
+      - match_id
+      - constraint
+      - objective
+      - score
+      - variable
+      - owner_id
+      - evaluation_error
+      - scoring_error
+      - created_at
+      - evaluation_finished_at
+      - evaluation_started_at
+      - scoring_finished_at
+      - scoring_started_at
+      - updated_at
+      filter:
+        _or:
+        - owner_id:
+            _eq: X-Hasura-User-Id
+        - match:
+            competition:
+              _or:
+              - owner_id:
+                  _eq: X-Hasura-User-Id
+              - close_at:
+                  _lt: now()
+      allow_aggregations: true
+- table:
+    schema: public
+    name: users
+  array_relationships:
+  - name: competitions
+    using:
+      foreign_key_constraint_on:
+        column: owner_id
+        table:
+          schema: public
+          name: competitions
+  - name: indicators
+    using:
+      foreign_key_constraint_on:
+        column: owner_id
+        table:
+          schema: public
+          name: indicators
+  - name: problems
+    using:
+      foreign_key_constraint_on:
+        column: owner_id
+        table:
+          schema: public
+          name: problems
+  - name: solutions
+    using:
+      foreign_key_constraint_on:
+        column: owner_id
+        table:
+          schema: public
+          name: solutions
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - created_at
+      - name
+      - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: user
+    permission:
+      columns:
+      - created_at
+      - name
+      - updated_at
+      filter: {}
+      allow_aggregations: true
