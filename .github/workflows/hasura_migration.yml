@@ -26,7 +26,7 @@ jobs:
           HASURA_ENDPOINT: ${{ secrets.HASURA_ENDPOINT }}
           HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
           HASURA_WORKDIR: hasura
-          HASURA_ENGINE_VERSION: v2.6.1  # this version applies the current migration after exporting
+          HASURA_ENGINE_VERSION: v2.6.1  # this version marks as applied the current migration after exporting
       
       - name: Export Hasura metadata
         uses: tibotiber/hasura-action@v2.1
