@@ -1,6 +1,6 @@
 - table:
-    schema: public
     name: competitions
+    schema: public
   object_relationships:
     - name: owner
       using:
@@ -11,8 +11,8 @@
         foreign_key_constraint_on:
           column: competition_id
           table:
-            schema: public
             name: matches
+            schema: public
   insert_permissions:
     - role: user
       permission:
@@ -26,7 +26,6 @@
           - id
           - public
           - open_at
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -77,9 +76,16 @@
           owner_id:
             _eq: X-Hasura-User-Id
         check: {}
+  delete_permissions:
+    - role: user
+      permission:
+        backend_only: false
+        filter:
+          owner_id:
+            _eq: X-Hasura-User-Id
 - table:
-    schema: public
     name: environments
+    schema: public
   object_relationships:
     - name: match
       using:
@@ -97,7 +103,6 @@
           - match_id
           - public
           - value
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -160,9 +165,18 @@
             competition:
               owner_id:
                 _eq: X-Hasura-User-Id
+  delete_permissions:
+    - role: user
+      permission:
+        backend_only: false
+        filter:
+          match:
+            competition:
+              owner_id:
+                _eq: X-Hasura-User-Id
 - table:
-    schema: public
     name: indicators
+    schema: public
   object_relationships:
     - name: owner
       using:
@@ -173,8 +187,8 @@
         foreign_key_constraint_on:
           column: indicator_id
           table:
-            schema: public
             name: matches
+            schema: public
   insert_permissions:
     - role: user
       permission:
@@ -187,7 +201,6 @@
           - id
           - image
           - public
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -235,9 +248,16 @@
           owner_id:
             _eq: X-Hasura-User-Id
         check: {}
+  delete_permissions:
+    - role: user
+      permission:
+        backend_only: false
+        filter:
+          owner_id:
+            _eq: X-Hasura-User-Id
 - table:
-    schema: public
     name: matches
+    schema: public
   object_relationships:
     - name: competition
       using:
@@ -254,15 +274,15 @@
         foreign_key_constraint_on:
           column: match_id
           table:
-            schema: public
             name: environments
+            schema: public
     - name: solutions
       using:
         foreign_key_constraint_on:
           column: match_id
           table:
-            schema: public
             name: solutions
+            schema: public
   insert_permissions:
     - role: user
       permission:
@@ -276,7 +296,6 @@
           - indicator_id
           - name
           - problem_id
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -336,9 +355,17 @@
           competition:
             owner_id:
               _eq: X-Hasura-User-Id
+  delete_permissions:
+    - role: user
+      permission:
+        backend_only: false
+        filter:
+          competition:
+            owner_id:
+              _eq: X-Hasura-User-Id
 - table:
-    schema: public
     name: problems
+    schema: public
   object_relationships:
     - name: owner
       using:
@@ -349,8 +376,8 @@
         foreign_key_constraint_on:
           column: problem_id
           table:
-            schema: public
             name: matches
+            schema: public
   insert_permissions:
     - role: user
       permission:
@@ -363,7 +390,6 @@
           - id
           - image
           - public
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -411,26 +437,35 @@
           owner_id:
             _eq: X-Hasura-User-Id
         check: {}
+  delete_permissions:
+    - role: user
+      permission:
+        backend_only: false
+        filter:
+          owner_id:
+            _eq: X-Hasura-User-Id
 - table:
-    schema: public
     name: progress
+    schema: public
   object_relationships:
     - name: match
       using:
         manual_configuration:
-          remote_table:
-            schema: public
-            name: matches
           column_mapping:
             match_id: id
+          insertion_order: null
+          remote_table:
+            name: matches
+            schema: public
     - name: user
       using:
         manual_configuration:
-          remote_table:
-            schema: public
-            name: users
           column_mapping:
             user_id: id
+          insertion_order: null
+          remote_table:
+            name: users
+            schema: public
   select_permissions:
     - role: anonymous
       permission:
@@ -452,7 +487,14 @@
           - submitted
           - updated_at
           - user_id
-        filter: {}
+        filter:
+          match:
+            _or:
+              - public:
+                  _eq: true
+              - competition:
+                  close_at:
+                    _lt: now()
         allow_aggregations: true
     - role: user
       permission:
@@ -479,16 +521,19 @@
             - user_id:
                 _eq: X-Hasura-User-Id
             - match:
-                competition:
-                  _or:
-                    - owner_id:
-                        _eq: X-Hasura-User-Id
-                    - close_at:
-                        _lt: now()
+                _or:
+                  - public:
+                      _eq: true
+                  - competition:
+                      _or:
+                        - owner_id:
+                            _eq: X-Hasura-User-Id
+                        - close_at:
+                            _lt: now()
         allow_aggregations: true
 - table:
-    schema: public
     name: solutions
+    schema: public
   object_relationships:
     - name: match
       using:
@@ -505,7 +550,6 @@
         columns:
           - match_id
           - variable
-        backend_only: false
   select_permissions:
     - role: anonymous
       permission:
@@ -531,7 +575,7 @@
             competition:
               close_at:
                 _lt: now()
-        limit: 100
+        limit: 10000
         allow_aggregations: true
     - role: user
       permission:
@@ -565,37 +609,37 @@
                         _lt: now()
         allow_aggregations: true
 - table:
-    schema: public
     name: users
+    schema: public
   array_relationships:
     - name: competitions
       using:
         foreign_key_constraint_on:
           column: owner_id
           table:
-            schema: public
             name: competitions
+            schema: public
     - name: indicators
       using:
         foreign_key_constraint_on:
           column: owner_id
           table:
-            schema: public
             name: indicators
+            schema: public
     - name: problems
       using:
         foreign_key_constraint_on:
           column: owner_id
           table:
-            schema: public
             name: problems
+            schema: public
     - name: solutions
       using:
         foreign_key_constraint_on:
           column: owner_id
           table:
-            schema: public
             name: solutions
+            schema: public
   select_permissions:
     - role: anonymous
       permission:
