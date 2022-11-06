@@ -296,17 +296,19 @@
           - indicator_id
           - name
           - problem_id
+          - public
   select_permissions:
     - role: anonymous
       permission:
         columns:
           - budget
-          - created_at
           - competition_id
+          - created_at
           - id
           - indicator_id
           - name
           - problem_id
+          - public
           - updated_at
         filter:
           competition:
@@ -320,12 +322,13 @@
       permission:
         columns:
           - budget
-          - created_at
           - competition_id
+          - created_at
           - id
           - indicator_id
           - name
           - problem_id
+          - public
           - updated_at
         filter:
           competition:
@@ -347,6 +350,7 @@
           - indicator_id
           - name
           - problem_id
+          - public
         filter:
           competition:
             owner_id:
