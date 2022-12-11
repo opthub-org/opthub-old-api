@@ -637,6 +637,15 @@
           table:
             name: problems
             schema: public
+    - name: progress
+      using:
+        manual_configuration:
+          column_mapping:
+            id: user_id
+          insertion_order: null
+          remote_table:
+            name: progress
+            schema: public
     - name: solutions
       using:
         foreign_key_constraint_on:
