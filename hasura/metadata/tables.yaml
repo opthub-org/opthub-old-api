@@ -548,7 +548,19 @@
   insert_permissions:
     - role: user
       permission:
-        check: {}
+        check:
+          match:
+            competition:
+              _or:
+                - owner_id:
+                    _eq: X-Hasura-User-Id
+                - _and:
+                    - public:
+                        _eq: true
+                    - open_at:
+                        _lte: now()
+                    - close_at:
+                        _gte: now()
         set:
           owner_id: X-Hasura-User-Id
         columns:
